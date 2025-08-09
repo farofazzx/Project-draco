@@ -42,9 +42,7 @@
       position: absolute;
       top: 20px; left: 20px; right: 20px;
       display: flex;
-      justify-content:
-
- space-between;
+      justify-content: space-between;
       align-items: center;
       z-index: 10;
     }
@@ -69,7 +67,7 @@
       top: 0; right: -250px;
       width: 250px; height: 100%;
       background: rgba(0, 0, 0, 0.9);
-      display: flexed;
+      display: flex;
       flex-direction: column;
       align-items: center;
       padding-top: 60px;
@@ -211,7 +209,7 @@
       transform: scale(1.2);
     }
     #audio-player {
-      display: none; /* Esconde o elemento de áudio nativo */
+      display: none;
     }
   </style>
 </head>
@@ -249,10 +247,10 @@
   </div>
 
   <!-- Elemento de áudio para tocar Lo-Fi royalty-free -->
-  <audio id="audio-player" src="https://cdn.pixabay.com/audio/2024/09/18/audio_5a0f2b91fe.mp3" loop preload="auto"></audio>
+  <audio id="audio-player" src="https://cdn.pixabay.com/audio/2023/12/04/audio_9c6e7418cd.mp3" loop preload="auto"></audio>
 
   <script>
-    // Função para redirecionar aleatoriamente (mantida do código original)
+    // Função para redirecionar aleatoriamente
     function redirectRandom() {
       const sites = [
         "https://www.google.com",
@@ -265,14 +263,14 @@
       window.location.href = randomSite;
     }
 
-    // Menu lateral (mantido do código original)
+    // Menu lateral
     const menuBtn = document.getElementById("menu-btn");
     const sideMenu = document.getElementById("side-menu");
     menuBtn.addEventListener("click", () => {
       sideMenu.classList.toggle("active");
     });
 
-    // Partículas (mantido do código original)
+    // Partículas
     const canvas = document.getElementById("particles");
     const ctx = canvas.getContext("2d");
     let particlesArray;
@@ -333,18 +331,9 @@
 
     // Função para atualizar os controles
     function updateControls() {
-      if (audioPlayer.paused) {
-        playBtn.textContent = "▶";
-      } else {
-        playBtn.textContent = "⏸";
-      }
-
-      if (audioPlayer.muted || audioPlayer.volume === 0) {
-        muteBtn.textContent = "🔇";
-      } else {
-        muteBtn.textContent = "🔊";
-      }
-
+      console.log("Atualizando controles: Pausado =", audioPlayer.paused, "Volume =", audioPlayer.volume, "Muted =", audioPlayer.muted);
+      playBtn.textContent = audioPlayer.paused ? "▶" : "⏸";
+      muteBtn.textContent = (audioPlayer.muted || audioPlayer.volume === 0) ? "🔇" : "🔊";
       volumeSlider.value = audioPlayer.volume;
     }
 
@@ -357,6 +346,13 @@
     // Manipulador para verificar se o áudio está pronto
     audioPlayer.addEventListener("canplay", () => {
       console.log("Áudio pronto para reprodução");
+      playBtn.disabled = false; // Habilita o botão de play quando o áudio está pronto
+    });
+
+    // Manipulador para quando o áudio começa a carregar
+    audioPlayer.addEventListener("loadstart", () => {
+      console.log("Iniciando carregamento do áudio");
+      playBtn.disabled = true; // Desabilita o botão de play até que o áudio esteja pronto
     });
 
     // Controles de play/pause
@@ -364,7 +360,7 @@
       if (audioPlayer.paused) {
         audioPlayer.play().then(() => {
           console.log("Reprodução iniciada");
-          playBtn.textContent = "⏸";
+          updateControls();
         }).catch((error) => {
           console.error("Erro ao tentar reproduzir o áudio:", error);
           alert("Erro ao iniciar a reprodução. Certifique-se de interagir com a página.");
@@ -372,7 +368,7 @@
       } else {
         audioPlayer.pause();
         console.log("Reprodução pausada");
-        playBtn.textContent = "▶";
+        updateControls();
       }
     });
 
@@ -381,22 +377,22 @@
       if (audioPlayer.muted || audioPlayer.volume === 0) {
         audioPlayer.muted = false;
         audioPlayer.volume = 1.0;
-        muteBtn.textContent = "🔊";
         volumeSlider.value = 1.0;
       } else {
         audioPlayer.muted = true;
-        muteBtn.textContent = "🔇";
         volumeSlider.value = 0;
       }
+      console.log("Mute/Unmute: Muted =", audioPlayer.muted, "Volume =", audioPlayer.volume);
       updateControls();
     });
 
     // Controle de volume
     volumeSlider.addEventListener("input", () => {
-      const volume = volumeSlider.value;
+      const volume = parseFloat(volumeSlider.value);
       audioPlayer.volume = volume;
       audioPlayer.muted = volume === 0;
-      muteBtn.textContent = volume === 0 ? "🔇" : "🔊";
+      console.log("Volume alterado:", volume);
+      updateControls();
     });
 
     // Atualiza os controles ao carregar a página
