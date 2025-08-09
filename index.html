@@ -121,96 +121,6 @@
       border: none;
       border-radius: 12px;
     }
-    .audio-player {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #1a1a2e;
-      padding: 10px 15px;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      z-index: 20;
-      user-select: none;
-    }
-    .audio-player button {
-      background: #2e2e5a;
-      border: none;
-      border-radius: 8px;
-      width: 40px;
-      height: 40px;
-      color: #a67eff;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      padding: 0;
-      margin: 0;
-    }
-    .audio-player button:hover {
-      background: #4b4b8f;
-      transform: scale(1.1);
-      color: #d4b3ff;
-    }
-    .audio-player button:active {
-      transform: scale(0.95);
-    }
-    .audio-player button:focus {
-      outline: none;
-      box-shadow: 0 0 8px #a67eff;
-    }
-    .audio-player button[disabled] {
-      opacity: 0.5;
-      cursor: default;
-      background: #3a3a66;
-    }
-    .audio-player input[type=range] {
-      -webkit-appearance: none;
-      width: 80px;
-      height: 4px;
-      border-radius: 2px;
-      background: #2e2e5a;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .audio-player input[type=range]:hover {
-      background: #4b4b8f;
-    }
-    .audio-player input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #a67eff;
-      cursor: pointer;
-      box-shadow: 0 0 4px #a67eff;
-      transition: background 0.3s, transform 0.2s;
-    }
-    .audio-player input[type=range]:focus::-webkit-slider-thumb {
-      background: #c8aaff;
-      transform: scale(1.2);
-    }
-    .audio-player input[type=range]::-moz-range-thumb {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #a67eff;
-      cursor: pointer;
-      box-shadow: 0 0 4px #a67eff;
-      transition: background 0.3s, transform 0.2s;
-    }
-    .audio-player input[type=range]:focus::-moz-range-thumb {
-      background: #c8aaff;
-      transform: scale(1.2);
-    }
-    #audio-player {
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -240,14 +150,8 @@
     <button onclick="redirectRandom()">Download</button>
   </div>
 
-  <div class="audio-player" role="region" aria-label="Player de música">
-    <button id="play-btn" aria-label="Play/Pause">▶</button>
-    <button id="mute-btn" aria-label="Mute/Unmute">🔊</button>
-    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" aria-label="Controle de volume" />
-  </div>
-
   <!-- Elemento de áudio para tocar Lo-Fi royalty-free -->
-  <audio id="audio-player" src="https://cdn.pixabay.com/audio/2023/12/04/audio_9c6e7418cd.mp3" loop preload="auto"></audio>
+  
 
   <script>
     // Função para redirecionar aleatoriamente
@@ -304,9 +208,7 @@
       }
     }
     function init() {
-      particlesArray = [];
-      for (let i = 0; i < 100; i++) {
-        particlesArray.push(new Particle());
+             particlesArray.push(new Particle());
       }
     }
     function animate() {
@@ -321,87 +223,12 @@
     animate();
 
     // Controles do player de áudio
-    const audioPlayer = document.getElementById("audio-player");
-    const playBtn = document.getElementById("play-btn");
-    const muteBtn = document.getElementById("mute-btn");
-    const volumeSlider = document.getElementById("volume-slider");
+  
 
-    // Configura o volume inicial
-    audioPlayer.volume = 1.0;
-
-    // Função para atualizar os controles
-    function updateControls() {
-      console.log("Atualizando controles: Pausado =", audioPlayer.paused, "Volume =", audioPlayer.volume, "Muted =", audioPlayer.muted);
-      playBtn.textContent = audioPlayer.paused ? "▶" : "⏸";
-      muteBtn.textContent = (audioPlayer.muted || audioPlayer.volume === 0) ? "🔇" : "🔊";
-      volumeSlider.value = audioPlayer.volume;
-    }
-
-    // Manipulador de erro para o áudio
-    audioPlayer.addEventListener("error", (e) => {
-      console.error("Erro ao carregar o áudio:", e);
-      alert("Não foi possível carregar a música. Tente recarregar a página ou usar outro navegador.");
+    // Configura o volume tão de play quando o áudio está pronto
     });
 
-    // Manipulador para verificar se o áudio está pronto
-    audioPlayer.addEventListener("canplay", () => {
-      console.log("Áudio pronto para reprodução");
-      playBtn.disabled = false; // Habilita o botão de play quando o áudio está pronto
-    });
-
-    // Manipulador para quando o áudio começa a carregar
-    audioPlayer.addEventListener("loadstart", () => {
-      console.log("Iniciando carregamento do áudio");
-      playBtn.disabled = true; // Desabilita o botão de play até que o áudio esteja pronto
-    });
-
-    // Controles de play/pause
-    playBtn.addEventListener("click", () => {
-      if (audioPlayer.paused) {
-        audioPlayer.play().then(() => {
-          console.log("Reprodução iniciada");
-          updateControls();
-        }).catch((error) => {
-          console.error("Erro ao tentar reproduzir o áudio:", error);
-          alert("Erro ao iniciar a reprodução. Certifique-se de interagir com a página.");
-        });
-      } else {
-        audioPlayer.pause();
-        console.log("Reprodução pausada");
-        updateControls();
-      }
-    });
-
-    // Controles de mute/unmute
-    muteBtn.addEventListener("click", () => {
-      if (audioPlayer.muted || audioPlayer.volume === 0) {
-        audioPlayer.muted = false;
-        audioPlayer.volume = 1.0;
-        volumeSlider.value = 1.0;
-      } else {
-        audioPlayer.muted = true;
-        volumeSlider.value = 0;
-      }
-      console.log("Mute/Unmute: Muted =", audioPlayer.muted, "Volume =", audioPlayer.volume);
-      updateControls();
-    });
-
-    // Controle de volume
-    volumeSlider.addEventListener("input", () => {
-      const volume = parseFloat(volumeSlider.value);
-      audioPlayer.volume = volume;
-      audioPlayer.muted = volume === 0;
-      console.log("Volume alterado:", volume);
-      updateControls();
-    });
-
-    // Atualiza os controles ao carregar a página
-    updateControls();
-
-    // Atualiza os controles quando o áudio mudar de estado
-    audioPlayer.addEventListener("play", updateControls);
-    audioPlayer.addEventListener("pause", updateControls);
-    audioPlayer.addEventListener("volumechange", updateControls);
+    // Manipulador para quando o áudio começa a carrega
   </script>
 </body>
 </html>
