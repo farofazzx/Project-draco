@@ -443,4 +443,53 @@ class MainWindow(QMainWindow):
 
         if not num_requests_str.isdigit() or int(num_requests_str) <= 0:
             self.log_message(" INVALID REQUEST COUNT! Please enter a positive number.")
-            self.requests_input.setStyleSheet(f"background-color: {COLOR_INPUT_BACKGROUND}; color: {COLOR_INPUT_TE
+            self.requests_input.setStyleSheet(f"background-color: {COLOR_INPUT_BACKGROUND}; color: {COLOR_INPUT_TEXT}; border: 2px solid {COLOR_ERROR_BORDER}; padding: 5px;")
+            return
+
+        num_requests = int(num_requests_str)
+        attack_mode = self.mode_selector.currentText()
+        use_proxy = self.use_proxy.isChecked()
+
+
+        self.start_button.setEnabled(False)
+        self.stop_button.setEnabled(True)
+        self.url_input.setEnabled(False)
+        self.requests_input.setEnabled(False)
+        self.mode_selector.setEnabled(False)
+        self.use_proxy.setEnabled(False)
+
+        self.progress_bar.setValue(0)
+        self.log_output.clear()
+        self.log_message(" Launching Mafia Team Panel ...")
+
+
+        self.attack_thread = AttackThread(url, num_requests, attack_mode, use_proxy)
+        self.attack_thread.log_signal.connect(self.log_message)
+        self.attack_thread.update_progress.connect(self.progress_bar.setValue)
+        self.attack_thread.start()
+
+    def stop_attack(self):
+        """
+        Requests the attack thread to stop and updates the UI accordingly.
+        """
+        if self.attack_thread and self.attack_thread.isRunning():
+            self.attack_thread.stop()
+            self.attack_thread.wait()
+
+        self.start_button.setEnabled(True)
+        self.stop_button.setEnabled(False)
+
+        self.url_input.setEnabled(True)
+        self.requests_input.setEnabled(True)
+        self.mode_selector.setEnabled(True)
+        self.use_proxy.setEnabled(True)
+        self.progress_bar.setValue(0)
+        self.log_message("Mafia Team Panel stopped.")
+
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
